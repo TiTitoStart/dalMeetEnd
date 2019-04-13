@@ -4,8 +4,7 @@ var xss = require('xss')
 var mongoose =  require('mongoose')
 var User = mongoose.model('User')
 var uuid = require('uuid')
-var userHelper = require('../dbhelper/userHelper')
-// import userHelper from '../dbhelper/userHelper'
+import userHelper from '../dbhelper/userHelper'
 
 /**
  * 注册新用户
@@ -13,43 +12,95 @@ var userHelper = require('../dbhelper/userHelper')
  * @yield {[type]}   [description]
  */
 exports.signup = async (ctx, next) => {
-	var phoneNumber = xss(ctx.request.body.phoneNumber.trim())
+  var phoneNumber = xss(ctx.request.body.phoneNumber)
+  var password = xss(ctx.request.body.password)
 	var user = await User.findOne({
 	  phoneNumber: phoneNumber
 	}).exec()
-  console.log(user)
-	
+	if(!phoneNumber || !password) {
+    ctx.body = {
+      code: 0,
+      result: '参数缺失'
+    }
+    return next
+  }
 	var verifyCode = Math.floor(Math.random()*10000+1)
-  console.log(phoneNumber)
 	if (!user) {
 	  var accessToken = uuid.v4()
 
 	  user = new User({
-	    nickname: '测试用户',
+	    nickname: '还没有昵称呢',
 	    avatar: 'http://upload-images.jianshu.io/upload_images/5307186-eda1b28e54a4d48e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240',
 	    phoneNumber: xss(phoneNumber),
 	    verifyCode: verifyCode,
-	    accessToken: accessToken
-	  })
+      accessToken: accessToken,
+      password: password
+    })
+    try {
+      user = await user.save()
+      ctx.body = {
+        code: 0,
+        result: user
+      }
+    }
+    catch (e) {
+      ctx.body = {
+        code: 405,
+        result: '服务器发生错误'
+      }
+      return next
+    }
 	}
 	else {
-	  user.verifyCode = verifyCode
+	  ctx.body = {
+      code: 401,
+      result: '用户已存在'
+    }
+    return next
 	}
+}
 
+/**
+ * 登入
+ * @param {Function} next
+ * @yield {[type]}
+ */
+exports.login = async (ctx, next) => {
+  var phoneNumber = xss(ctx.request.body.phoneNumber.trim())
+  var password = ctx.request.body.password
+	var user = await User.findOne({
+	  phoneNumber: phoneNumber
+	}).exec()
+  console.log(user)
+  if(!user) {
+    ctx.body = {
+      code: 403,
+      result: '用户不存在'
+    }
+    return next
+  }
+  if(user.password !== password) {
+    ctx.body = {
+      code: 404,
+      result: '密码错误'
+    }
+    return next
+  }
+  user.accessToken = uuid.v4()
 	try {
     user = await user.save()
     ctx.body = {
-      success: true
+      code: 0,
+      result: user
     }
   }
   catch (e) {
     ctx.body = {
-      success: false
+      success: 405,
+      result: '服务器发生错误'
     }
-
     return next
   }
-
 }
 
 /**
@@ -72,8 +123,8 @@ exports.update = async (ctx, next) => {
   user = await user.save()
 
   ctx.body = {
-    success: true,
-    data: {
+    code: 0,
+    result: {
       nickname: user.nickname,
       accessToken: user.accessToken,
       avatar: user.avatar,
@@ -99,32 +150,32 @@ exports.users = async (ctx, next) => {
   // console.log('obj=====================================>'+obj)
   
   ctx.body = {
-    success: true,
-    data
+    code: 0,
+    result: data
   }
 }
-exports.addUser = async (ctx, next) => {
-  var user = new User({
-      nickname: '测试用户',
-      avatar: 'http://ip.example.com/u/xxx.png',
-      phoneNumber: xss('13800138001'),
-      verifyCode: '5897',
-      accessToken: uuid.v4()
-    })
-  var user2 =  await userHelper.addUser(user)
-  if(user2){
-    ctx.body = {
-      success: true,
-      data : user2
-    }
-  }
-}
+// exports.addUser = async (ctx, next) => {
+//   var user = new User({
+//       nickname: '测试用户',
+//       avatar: 'http://ip.example.com/u/xxx.png',
+//       phoneNumber: xss('13800138000'),
+//       verifyCode: '5897',
+//       accessToken: uuid.v4()
+//     })
+//   var user2 =  await userHelper.addUser(user)
+//   if(user2){
+//     ctx.body = {
+//       success: true,
+//       data : user2
+//     }
+//   }
+// }
 exports.deleteUser = async (ctx, next) => {
   const phoneNumber = xss(ctx.request.body.phoneNumber.trim())
   console.log(phoneNumber)
   var data  = await userHelper.deleteUser({phoneNumber})
   ctx.body = {
-    success: true,
-    data
+    code: 0,
+    result: data
   }
 }

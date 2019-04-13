@@ -18,7 +18,7 @@ exports.findByPhoneNumber = async ({phoneNumber}) => {
 			res = user
 		}
 	})
-	// console.log('res====>' + res)
+	console.log('res====>' + res)
 	return res;
 }
 

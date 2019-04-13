@@ -1,29 +1,37 @@
-const Koa = require('koa')
-const app = new Koa()
-const views = require('koa-views')
-const json = require('koa-json')
-const onerror = require('koa-onerror')
-const bodyparser = require('koa-bodyparser')
-const logger = require('koa-logger')
-const session = require('koa-session')
+'use strict'
 
 const fs = require('fs')
 const path = require('path')
 const mongoose = require('mongoose')
 
-// 连接数据库
+// const db = 'mongodb://localhost/test'
+
+/**
+ * mongoose连接数据库
+ * @type {[type]}
+ */
 mongoose.Promise = require('bluebird')
+// mongoose.connection.openUri(db)
 mongoose.connect('mongodb://localhost/test')
 
-const models_path = path.join(__dirname, './models')
+/**
+ * 获取数据库表对应的js对象所在的路径
+ * @type {[type]}
+ */
+const models_path = path.join(__dirname, '/app/models')
 
+
+/**
+ * 已递归的形式，读取models文件夹下的js模型文件，并require
+ * @param  {[type]} modelPath [description]
+ * @return {[type]}           [description]
+ */
 var walk = function(modelPath) {
   fs
     .readdirSync(modelPath)
     .forEach(function(file) {
       var filePath = path.join(modelPath, '/' + file)
       var stat = fs.statSync(filePath)
-      console.log('filePath', filePath)
 
       if (stat.isFile()) {
         if (/(.*)\.(js|coffee)/.test(file)) {
@@ -38,41 +46,31 @@ var walk = function(modelPath) {
 walk(models_path)
 
 require('babel-register')
+const Koa = require('koa')
+const logger = require('koa-logger')
+const session = require('koa-session')
+const bodyParser = require('koa-bodyparser')
+var cors = require('koa2-cors');
+const app = new Koa()
 
-// error handler
-onerror(app)
-
-// middlewares
-app.use(session(app))
-app.use(bodyparser({
-  enableTypes:['json', 'form', 'text']
-}))
-app.use(json())
+app.keys = ['zhangivon']
 app.use(logger())
-app.use(views(__dirname + '/views', {
-  extension: 'pug'
-}))
+app.use(session(app))
+app.use(bodyParser())
+app.use(cors())
+
+
+/**
+ * 使用路由转发请求
+ * @type {[type]}
+ */
+const router = require('./config/router')()
+
+app
+  .use(router.routes())
+  .use(router.allowedMethods());
 
 
 
-// logger
-app.use(async (ctx, next) => {
-  const start = new Date()
-  await next()
-  const ms = new Date() - start
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
-})
-
-const index = require('./routes/index')
-const users = require('./routes/users')
-
-// routes
-app.use(index.routes(), index.allowedMethods())
-app.use(users.routes(), users.allowedMethods())
-
-// error-handling
-app.on('error', (err, ctx) => {
-  console.error('server error', err, ctx)
-});
-
-module.exports = app
+app.listen(4400)
+console.log('app started at port 4400...');

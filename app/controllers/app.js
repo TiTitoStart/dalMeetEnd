@@ -9,7 +9,7 @@ var User = mongoose.model('User')
 exports.hasBody = async (ctx, next) => {
   var body = ctx.request.body || {}
   // console.log(this.query.phonenumber)
-  console.log(body)
+  console.log('body', body)
 
   if (Object.keys(body).length === 0) {
     ctx.body = {
@@ -25,11 +25,8 @@ exports.hasBody = async (ctx, next) => {
 
 // 检验token
 exports.hasToken = async (ctx, next) => {
-  var accessToken = ctx.query.accessToken
-
-  if (!accessToken) {
-    accessToken = ctx.request.body.accessToken
-  }
+  var accessToken = ctx.header.token
+  console.log('ctx.header.Token', ctx.header.token);
 
   if (!accessToken) {
     ctx.body = {
