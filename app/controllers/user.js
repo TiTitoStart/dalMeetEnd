@@ -19,7 +19,7 @@ exports.signup = async (ctx, next) => {
 	}).exec()
 	if(!phoneNumber || !password) {
     ctx.body = {
-      code: 0,
+      code: 406,
       result: '参数缺失'
     }
     return next
@@ -30,7 +30,7 @@ exports.signup = async (ctx, next) => {
 
 	  user = new User({
 	    nickname: '还没有昵称呢',
-	    avatar: 'http://upload-images.jianshu.io/upload_images/5307186-eda1b28e54a4d48e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240',
+	    avatar: 'https://dpic.tiankong.com/gk/if/QJ6630287935.jpg?x-oss-process=style/670ws',
 	    phoneNumber: xss(phoneNumber),
 	    verifyCode: verifyCode,
       accessToken: accessToken,
@@ -112,11 +112,11 @@ exports.login = async (ctx, next) => {
 exports.update = async (ctx, next) => {
   var body = ctx.request.body
   var user = ctx.session.user
-  var fields = 'avatar,gender,age,nickname,breed'.split(',')
+  var fields = 'avatar,gender,age,nickname,real_name,career,own_tags,slogan,command'.split(',')
 
   fields.forEach(function(field) {
     if (body[field]) {
-      user[field] = xss(body[field].trim())
+      user[field] = JSON.parse(JSON.stringify(xss(body[field])))
     }
   })
 
@@ -124,15 +124,7 @@ exports.update = async (ctx, next) => {
 
   ctx.body = {
     code: 0,
-    result: {
-      nickname: user.nickname,
-      accessToken: user.accessToken,
-      avatar: user.avatar,
-      age: user.age,
-      breed: user.breed,
-      gender: user.gender,
-      _id: user._id
-    }
+    result: user
   }
 }
 

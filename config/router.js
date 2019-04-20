@@ -15,7 +15,8 @@ module.exports = function(){
   // router.post('/u/update', App.hasBody, App.hasToken, User.update)
 
   // DB Interface test
-  router.get('/users/get',User.users)
+  router.get('/users/get', User.users)
+  router.post('/users/update', App.hasBody, App.hasToken, User.update)
   // router.post('/test/user/add',User.addUser)
 
   // router.post('/test/user/delete',User.deleteUser)
@@ -30,7 +31,7 @@ module.exports = function(){
   //获取
   router.post('/moment/get', App.hasToken, Moment.get)
   //删除
-  router.post('/moment/get',App.hasBody, App.hasToken, Moment.delete)
+  router.post('/moment/delete',App.hasBody, App.hasToken, Moment.delete)
 
   return router
 }

@@ -13,8 +13,8 @@ exports.hasBody = async (ctx, next) => {
 
   if (Object.keys(body).length === 0) {
     ctx.body = {
-      success: false,
-      err: '某参数缺失'
+      result: '某参数缺失',
+      code: 406
     }
 
     return next
@@ -30,8 +30,8 @@ exports.hasToken = async (ctx, next) => {
 
   if (!accessToken) {
     ctx.body = {
-      success: false,
-      err: '令牌失效'
+      result: '令牌失效',
+      code: 407
     }
 
     return next
@@ -44,8 +44,8 @@ exports.hasToken = async (ctx, next) => {
 
   if (!user) {
     ctx.body = {
-      success: false,
-      err: '用户没登陆'
+      result: '用户没有登入',
+      code: 408
     }
 
     return next
