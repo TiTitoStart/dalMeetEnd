@@ -116,7 +116,14 @@ exports.update = async (ctx, next) => {
 
   fields.forEach(function(field) {
     if (body[field]) {
-      user[field] = JSON.parse(JSON.stringify(xss(body[field])))
+      if(body[field] instanceof Object) {
+        for(let i in body[field]) {
+          user[field][i] = body[field][i]
+        }
+      }
+      else {
+        user[field] = JSON.parse(JSON.stringify(xss(body[field])))
+      }
     }
   })
 
@@ -146,22 +153,7 @@ exports.users = async (ctx, next) => {
     result: data
   }
 }
-// exports.addUser = async (ctx, next) => {
-//   var user = new User({
-//       nickname: '测试用户',
-//       avatar: 'http://ip.example.com/u/xxx.png',
-//       phoneNumber: xss('13800138000'),
-//       verifyCode: '5897',
-//       accessToken: uuid.v4()
-//     })
-//   var user2 =  await userHelper.addUser(user)
-//   if(user2){
-//     ctx.body = {
-//       success: true,
-//       data : user2
-//     }
-//   }
-// }
+/* 删除用户操作*/
 exports.deleteUser = async (ctx, next) => {
   const phoneNumber = xss(ctx.request.body.phoneNumber.trim())
   console.log(phoneNumber)
@@ -169,5 +161,18 @@ exports.deleteUser = async (ctx, next) => {
   ctx.body = {
     code: 0,
     result: data
+  }
+}
+/* 新增likeList操作*/
+exports.addLike = async (ctx, next) => {
+  var body = ctx.request.body
+  var user = ctx.session.user
+  user.like_list = body.like_list
+
+  user = await user.save()
+
+  ctx.body = {
+    code: 0,
+    likeList: user.like_list
   }
 }
