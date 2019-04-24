@@ -53,11 +53,17 @@ const bodyParser = require('koa-bodyparser')
 var cors = require('koa2-cors');
 const app = new Koa()
 
-app.keys = ['zhangivon']
+// const server = require('http').Server(app);
+// const io = require('socket.io')(server);
+// const socket = require('./app/controllers/socket')
+
+app.keys = ['tindy']
 app.use(logger())
 app.use(session(app))
 app.use(bodyParser())
 app.use(cors())
+
+
 
 
 /**
@@ -71,6 +77,36 @@ app
   .use(router.allowedMethods());
 
 
-
 app.listen(4400)
+
+// const server = require('http').Server(app);
+const Server = require('socket.io')
+const io = new Server(4200)
+//上线人数
+var hashName = new Array()
+io.on('connection', (socket) => {
+  console.log('连接建立')
+  // 群聊
+  socket.on('sendGroupMsg', function (data) {
+    socket.emit('receiveGroupMsg', data);
+  });
+
+  // 上线
+  socket.on('online', data => {
+    console.log('name', data)
+    // hashName.push(socket.id)
+    hashName[data._id] = socket.id
+    console.log('hashName', hashName);
+    socket.emit('getVal', data)
+  });
+  //向指定用户发送消息(同时在线上)
+  socket.on('sayTo', data => {
+    console.log('sayToname', data)
+    console.log(io.sockets.sockets.hasOwnProperty(data.fid))
+    if(hashName.hasOwnProperty(data.fid) && io.sockets.sockets[hashName[data.fid]]) {
+      var toSocket = io.sockets.sockets[hashName[data.fid]]
+      toSocket.emit('message', data)
+    }
+  });
+})
 console.log('app started at port 4400...');
