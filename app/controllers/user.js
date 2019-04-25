@@ -145,9 +145,6 @@ exports.update = async (ctx, next) => {
  */
 exports.users = async (ctx, next) => {
   var data = await userHelper.findAllUsers()
-  // var obj = await userHelper.findByPhoneNumber({phoneNumber : '13525584568'})
-  // console.log('obj=====================================>'+obj)
-  
   ctx.body = {
     code: 0,
     result: data
@@ -167,12 +164,20 @@ exports.deleteUser = async (ctx, next) => {
 exports.addLike = async (ctx, next) => {
   var body = ctx.request.body
   var user = ctx.session.user
-  user.like_list = body.like_list
-
-  user = await user.save()
-
-  ctx.body = {
-    code: 0,
-    likeList: user.like_list
+  console.log('like_list', user)
+  if(user.like_list.indexOf(body.like) === -1) {
+     user.like_list = user.like_list.push(body.like)
+     user = await user.save()
+     console.log('like_list', user.like_list)
+     ctx.body = {
+       code: 0,
+       result: user.like
+     }
+  }
+  else {
+    ctx.body = {
+      code: 204,
+      result: '已存在'
+    }
   }
 }
