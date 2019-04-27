@@ -162,16 +162,18 @@ exports.deleteUser = async (ctx, next) => {
 }
 /* 新增likeList操作*/
 exports.addLike = async (ctx, next) => {
-  var body = ctx.request.body
+  var like = xss(ctx.request.body.like.trim())
   var user = ctx.session.user
+  var likeList = user.like_list
   console.log('like_list', user)
-  if(user.like_list.indexOf(body.like) === -1) {
-     user.like_list = user.like_list.push(body.like)
+  if(likeList.indexOf(like) === -1) {
+     likeList.push(like)
+     user.like_list = likeList
      user = await user.save()
-     console.log('like_list', user.like_list)
+     console.log('likeList', user.like_list)
      ctx.body = {
        code: 0,
-       result: user.like
+       result: user.like_list
      }
   }
   else {
