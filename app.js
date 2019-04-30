@@ -101,10 +101,10 @@ io.on('connection', (socket) => {
   });
   //向指定用户发送消息(同时在线上)
   socket.on('sayTo', data => {
-    console.log('sayToname', data)
     console.log(io.sockets.sockets.hasOwnProperty(data.fid))
     if(hashName.hasOwnProperty(data.fid) && io.sockets.sockets[hashName[data.fid]]) {
       var toSocket = io.sockets.sockets[hashName[data.fid]]
+      console.log('receive', data)
       toSocket.emit('message', data)
     }
   });
