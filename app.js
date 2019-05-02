@@ -97,7 +97,6 @@ io.on('connection', (socket) => {
     // hashName.push(socket.id)
     hashName[data._id] = socket.id
     console.log('hashName', hashName);
-    socket.emit('getVal', data)
   });
   //向指定用户发送消息(同时在线上)
   socket.on('sayTo', data => {

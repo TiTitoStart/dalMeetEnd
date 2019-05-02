@@ -185,7 +185,7 @@ exports.addLike = async (ctx, next) => {
   }
 }
 
-/* 新增likeList操作*/
+/* 获取likeList详情操作*/
 exports.getLike = async (ctx, next) => {
   var id = xss(ctx.request.body.id.trim())
   var test = await User.findOne({
@@ -202,7 +202,7 @@ exports.getLike = async (ctx, next) => {
   }
 }
 
-/* 新增likeList操作*/
+/* 查找具体id信息*/
 exports.findOne = async (ctx, next) => {
   var id = xss(ctx.request.body.id.trim())
   var result = await User.findOne({
