@@ -14,6 +14,8 @@ var MomentSchema = new Schema({
   user_id: String,
   content: String,
   imgs_url: Array,
+  avatar: String,
+  nickname: String,
   meta: {
     createAt: {
       type: Date,

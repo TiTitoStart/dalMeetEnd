@@ -30,7 +30,9 @@ exports.add = async (ctx, next) => {
   var myMoment = new Moment({
     content: content,
     imgs_url: imgs_url,
-    user_id: user._id
+    user_id: user._id,
+    avatar: user.avatar,
+    nickname: user.nickname
   })
   console.log('add moment ======>', myMoment)
   try {
@@ -65,6 +67,25 @@ exports.get = async (ctx, next) => {
   ctx.body = {
     code: 0,
     result: Moment
+  }
+}
+
+/**
+ * 获取指定用户关注用户的所有状态
+ * @param {Function} next
+ * @yield {[type]}
+ */
+exports.getLike = async (ctx, next) => {
+  var token = ctx.header.token
+  var user = await User.findOne({
+	  accessToken: token
+  }).exec()
+  var likeList = user.like_list
+	var Moments = await Moment.find({ user_id: { $in: likeList } });
+  console.log('Moments', Moments)
+  ctx.body = {
+    code: 0,
+    result: Moments
   }
 }
 
