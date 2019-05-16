@@ -114,3 +114,11 @@ exports.delete = async (ctx, next) => {
     result: data
   }
 }
+
+exports.getAll = async (ctx, next) => {
+  var data = await MomentHelper.findAllMoments()
+  ctx.body = {
+    code: 0,
+    result: data
+  }
+}

@@ -52,3 +52,20 @@ exports.deleteMoment = async ({_id}) => {
 	console.log('flag=====await=====>'+flag)
 	return flag
 }
+
+/**
+ * 查找所用
+ * @return {[type]} [description]
+ */
+exports.findAllMoments = async () => {
+	var query = Moment.find({});
+	var res = []
+	await query.exec(function(err, moments) {
+		if(err) {
+			res = []
+		}else {
+			res = moments;
+		}
+	})
+	return res
+}
