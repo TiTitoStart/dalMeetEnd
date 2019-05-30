@@ -112,7 +112,7 @@ exports.login = async (ctx, next) => {
 exports.update = async (ctx, next) => {
   var body = ctx.request.body
   var user = ctx.session.user
-  var fields = 'avatar,gender,age,nickname,real_name,career,own_tags,slogan,command'.split(',')
+  var fields = 'avatar,gender,age,nickname,real_name,career,slogan'.split(',')
 
   fields.forEach(function(field) {
     if (body[field]) {
@@ -126,6 +126,13 @@ exports.update = async (ctx, next) => {
       }
     }
   })
+
+  if(body['tagList']) {
+    user['own_tags'] = body['tagList']
+  }
+  if(body['command']) {
+    user['command'] = body['command']
+  }
 
   user = await user.save()
 

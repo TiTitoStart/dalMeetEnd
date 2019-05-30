@@ -31,7 +31,7 @@ var UserSchema = new Schema({
   command: {
     tags: Array,
     career: String,
-    age: Number
+    age: String
   },//我的要求
   meta: {
     createAt: {

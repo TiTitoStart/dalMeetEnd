@@ -71,6 +71,21 @@ exports.get = async (ctx, next) => {
 }
 
 /**
+ * 通过id获取指定用户的所有状态
+ * @param {Function} next
+ * @yield {[type]}
+ */
+exports.getById = async (ctx, next) => {
+  var id = ctx.request.body.id
+	var Moment = await MomentHelper.findByUser({user_id: id})
+  console.log('Moment', Moment)
+  ctx.body = {
+    code: 0,
+    result: Moment
+  }
+}
+
+/**
  * 获取指定用户关注用户的所有状态
  * @param {Function} next
  * @yield {[type]}

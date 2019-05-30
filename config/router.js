@@ -33,6 +33,8 @@ module.exports = function(){
   router.post('/moment/add', App.hasBody, App.hasToken, Moment.add)
   //获取
   router.post('/moment/get', App.hasToken, Moment.get)
+  //获取
+  router.post('/moment/getById', App.hasBody, Moment.getById)
   router.post('/moment/query', Moment.getAll)
   //获取关注
   router.post('/moment/getLike', App.hasToken, Moment.getLike)
